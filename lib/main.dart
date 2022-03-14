@@ -100,17 +100,35 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> saveFile() async {
-    await file!.writeAsString(source);
+    if (file == null) {
+      saveAs();
+    } else {
+      await file!.writeAsString(source);
+    }
   }
 
   Future<void> saveAs() async {
     String? outputFile = await FilePicker.platform.saveFile(
-      dialogTitle: 'Select an output file:',
-      fileName: basename(file!.path),
+      dialogTitle: 'Save As',
+      fileName: file == null ? '' : basename(file!.path),
+      type: FileType.custom,
+      allowedExtensions: ['md'],
     );
+
     if (outputFile == null) {
       // User cancelled the picker
     }
+
+    setState(() {
+      file = File(outputFile! + '.md');
+    });
+
+    await file!.writeAsString(source);
+  }
+
+  void newFile() {
+    _codeController!.text = '';
+    file = null;
   }
 
   @override
@@ -155,6 +173,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                   case 'Save As':
                                     saveAs();
                                     break;
+                                  case 'New File':
+                                    newFile();
+                                    break;
+                                  case 'Export To PDF':
+                                    break;
+                                  case 'Export To HTML':
+                                    break;
                                 }
                               },
                               dropdownColor: vs2015Theme.values
@@ -169,8 +194,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                 'Open',
                                 'Save',
                                 'Save As',
-                                'Export',
                                 'New File',
+                                'Export To PDF',
+                                'Export To HTML',
                               ].map((value) {
                                 return DropdownMenuItem(
                                   value: value,
@@ -187,7 +213,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               child: Container(
                                 margin: const EdgeInsets.all(2.0),
                                 child: Text(
-                                  file!.parent.path,
+                                  file == null ? '' : file!.parent.path,
                                   style: const TextStyle(
                                     color: Colors.white,
                                   ),
@@ -234,7 +260,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: Container(
                               margin: const EdgeInsets.all(2.0),
                               child: Text(
-                                basename(file!.path),
+                                file == null ? '' : basename(file!.path),
                                 style: const TextStyle(
                                   color: Colors.white,
                                 ),
