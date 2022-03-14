@@ -1,13 +1,14 @@
-import 'dart:ui';
+import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:code_text_field/code_text_field.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:highlight/languages/markdown.dart';
 import 'package:flutter_highlight/themes/vs2015.dart';
+import 'package:path/path.dart';
 
 void main() {
   runApp(const MyApp());
@@ -49,19 +50,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   CodeController? _codeController;
-  var source = "# simple-markdown-editor\nA Markdown Editor created powered by Java that uses GitHub Markdown flavouring." +
-      " The most important aspects of this application are the abilities to open a Markdown file, allow the user to edit the file, and finally save the file.\n" +
-      "\n## Built With\n"
-          "- [commonmark-java](https://github.com/commonmark/commonmark-java)\n" +
-      "- [JavaFX](https://openjfx.io/)\n" +
-      "- [Prism.js](https://prismjs.com/)\n" +
-      "- [JSoup](https://jsoup.org/)\n" +
-      "- [RichTextFX](https://github.com/FXMisc/RichTextFX)\n" +
-      "- [Flying Saucer](https://github.com/flyingsaucerproject/flyingsaucer)\n" +
-      "- [iText 2.1.7](https://github.com/hwinkler/itext2)\n\n" +
-      "## Installation\nClone the repository. With JavaFX installed, inside `.vscode`, change the paths to the JavaFX jar files to your own paths in the *settings.json*. " +
-      "In the *launch.json* on the `vmArgs`, change the module path to your own. Run the application with `App.java`.\n\n" +
-      "## License\nDistributed under the MIT License. See `LICENSE` for more information.";
+  File? file;
+  String source = '# Lorem ipsum...';
 
   @override
   void initState() {
@@ -92,6 +82,37 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
+  Future<void> openFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['md'],
+    );
+
+    if (result != null) {
+      file = File(result.files.single.path!);
+      final contents = await file!.readAsString();
+      setState(() {
+        _codeController!.text = contents;
+      });
+    } else {
+      // User canceled the picker
+    }
+  }
+
+  Future<void> saveFile() async {
+    await file!.writeAsString(source);
+  }
+
+  Future<void> saveAs() async {
+    String? outputFile = await FilePicker.platform.saveFile(
+      dialogTitle: 'Select an output file:',
+      fileName: basename(file!.path),
+    );
+    if (outputFile == null) {
+      // User cancelled the picker
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,8 +125,78 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Column(
                 children: [
                   WindowTitleBarBox(
-                    child: SizedBox(
-                      child: MoveWindow(),
+                    child: MoveWindow(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          left: 8.0,
+                          bottom: 8.0,
+                          top: 5.0,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            DropdownButton<String>(
+                              value: null,
+                              hint: const Text(
+                                'File',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
+                              underline: const SizedBox(),
+                              onChanged: (value) {
+                                switch (value) {
+                                  case 'Open':
+                                    openFile();
+                                    break;
+                                  case 'Save':
+                                    saveFile();
+                                    break;
+                                  case 'Save As':
+                                    saveAs();
+                                    break;
+                                }
+                              },
+                              dropdownColor: vs2015Theme.values
+                                  .toList()
+                                  .first
+                                  .backgroundColor,
+                              focusColor: vs2015Theme.values
+                                  .toList()
+                                  .first
+                                  .backgroundColor,
+                              items: [
+                                'Open',
+                                'Save',
+                                'Save As',
+                                'Export',
+                                'New File',
+                              ].map((value) {
+                                return DropdownMenuItem(
+                                  value: value,
+                                  child: Text(
+                                    value,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                            Flexible(
+                              child: Container(
+                                margin: const EdgeInsets.all(2.0),
+                                child: Text(
+                                  file!.parent.path,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                   Expanded(
@@ -124,10 +215,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ),
-            const VerticalDivider(
-              indent: 10.0,
-              endIndent: 10.0,
-              color: Color(0xff4E4545),
+            MoveWindow(
+              child: const VerticalDivider(
+                indent: 10.0,
+                endIndent: 10.0,
+                color: Color(0xff4E4545),
+              ),
             ),
             Expanded(
               child: Column(
@@ -135,27 +228,43 @@ class _MyHomePageState extends State<MyHomePage> {
                   WindowTitleBarBox(
                     child: MoveWindow(
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          MinimizeWindowButton(
-                            animate: true,
-                            colors: WindowButtonColors(
-                              iconNormal: const Color(0xffC8CBBE),
+                          Flexible(
+                            child: Container(
+                              margin: const EdgeInsets.all(2.0),
+                              child: Text(
+                                basename(file!.path),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ),
-                          MaximizeWindowButton(
-                            animate: true,
-                            colors: WindowButtonColors(
-                              iconNormal: const Color(0xffC8CBBE),
-                            ),
-                          ),
-                          CloseWindowButton(
-                            animate: true,
-                            colors: WindowButtonColors(
-                              iconNormal: const Color(0xffC8CBBE),
-                              mouseOver: const Color.fromARGB(255, 199, 0, 0),
-                              iconMouseOver: Colors.white,
-                            ),
+                          Row(
+                            children: [
+                              MinimizeWindowButton(
+                                animate: true,
+                                colors: WindowButtonColors(
+                                  iconNormal: const Color(0xffC8CBBE),
+                                ),
+                              ),
+                              MaximizeWindowButton(
+                                animate: true,
+                                colors: WindowButtonColors(
+                                  iconNormal: const Color(0xffC8CBBE),
+                                ),
+                              ),
+                              CloseWindowButton(
+                                animate: true,
+                                colors: WindowButtonColors(
+                                  iconNormal: const Color(0xffC8CBBE),
+                                  mouseOver:
+                                      const Color.fromARGB(255, 199, 0, 0),
+                                  iconMouseOver: Colors.white,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -214,6 +323,15 @@ class _MyHomePageState extends State<MyHomePage> {
                         listBullet: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
+                        ),
+                        tableBorder: TableBorder.all(
+                          color: Colors.white,
+                        ),
+                        tableHead: const TextStyle(
+                          color: Colors.white,
+                        ),
+                        tableBody: const TextStyle(
+                          color: Colors.white,
                         ),
                       ),
                     ),
