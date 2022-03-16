@@ -33,6 +33,7 @@ dependencies:
   flutter_markdown: ^0.6.9
   code_text_field: ^1.0.2
   file_picker: ^4.5.1
+  markdown: ^4.0.1
 
 
   # The following adds the Cupertino Icons font to your application.

@@ -8,6 +8,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 
 import 'package:highlight/languages/markdown.dart';
 import 'package:flutter_highlight/themes/vs2015.dart';
+import 'package:markdown/markdown.dart' as md;
 import 'package:path/path.dart';
 
 void main() {
@@ -127,8 +128,46 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void newFile() {
-    _codeController!.text = '';
-    file = null;
+    setState(() {
+      source = '# Lorem ipsum...';
+      file = null;
+    });
+  }
+
+  Future<void> exportToPDF() async {
+    String? outputFile = await FilePicker.platform.saveFile(
+      dialogTitle: 'Export To PDF',
+      fileName: file == null ? '' : basename(file!.path),
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
+
+    if (outputFile == null) {
+      // User cancelled the picker
+    }
+
+    setState(() {
+      file = File(outputFile!);
+    });
+  }
+
+  Future<void> exportToHTML() async {
+    String? outputFile = await FilePicker.platform.saveFile(
+      dialogTitle: 'Export To HTML',
+      fileName: file == null ? '' : basename(file!.path),
+      type: FileType.custom,
+      allowedExtensions: ['html'],
+    );
+
+    if (outputFile == null) {
+      // User cancelled the picker
+    }
+
+    setState(() {
+      file = File(outputFile! + '.html');
+    });
+
+    await file!.writeAsString(md.markdownToHtml(source));
   }
 
   @override
@@ -147,7 +186,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: Padding(
                         padding: const EdgeInsets.only(
                           left: 8.0,
-                          bottom: 8.0,
                           top: 5.0,
                         ),
                         child: Row(
@@ -177,8 +215,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                     newFile();
                                     break;
                                   case 'Export To PDF':
+                                    exportToPDF();
                                     break;
                                   case 'Export To HTML':
+                                    exportToHTML();
                                     break;
                                 }
                               },
@@ -257,8 +297,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Flexible(
-                            child: Container(
-                              margin: const EdgeInsets.all(2.0),
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                left: 8.0,
+                                top: 5.0,
+                              ),
                               child: Text(
                                 file == null ? '' : basename(file!.path),
                                 style: const TextStyle(
