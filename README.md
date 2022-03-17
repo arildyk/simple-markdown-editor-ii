@@ -1,16 +1,20 @@
-# simple_markdown_editor_ii
+# simple-markdown-editor-ii
 
-A new Flutter project.
+![Screenshot](images/sme2.png)
 
-## Getting Started
+A Markdown Editor re-written from the simple-markdown-editor repository.
+The most important aspects of this application are the abilities to 
+open a Markdown file, allow the user to edit the file, and finally save the file.
 
-This project is a starting point for a Flutter application.
+## Built With
+- [bitsdojo_window](https://pub.dev/packages/bitsdojo_window)
+- [Flutter Markdown](https://pub.dev/packages/flutter_markdown)
+- [CodeField](https://pub.dev/packages/code_text_field)
+- [File Picker](https://pub.dev/packages/file_picker)
+- [Markdown](https://pub.dev/packages/markdown)
 
-A few resources to get you started if this is your first Flutter project:
+## Installation 
+Clone the repository. With Flutter installed, run the application with `main.dart`
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## License
+Distributed under the MIT License. See `LICENSE` for more information.
