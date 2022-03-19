@@ -15,6 +15,8 @@ import 'package:simple_markdown_editor_ii/config/markdown_stylesheet.dart';
 import 'package:simple_markdown_editor_ii/widgets/left_window_title_bar_box.dart';
 import 'package:simple_markdown_editor_ii/widgets/right_window_title_bar_box.dart';
 
+import 'package:url_launcher/url_launcher.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -194,6 +196,9 @@ class _HomePageState extends State<HomePage> {
                     child: Markdown(
                       data: source,
                       styleSheet: markdownStylesheet(context),
+                      onTapLink: (text, href, title) async =>
+                          await launch(href!),
+                      selectable: true,
                     ),
                   ),
                 ],
