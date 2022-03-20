@@ -13,6 +13,8 @@ open a Markdown file, allow the user to edit the file, and finally save the file
 - [File Picker](https://pub.dev/packages/file_picker)
 - [Markdown](https://pub.dev/packages/markdown)
 - [url_launcher](https://pub.dev/packages/url_launcher)
+- [pdf](https://pub.dev/packages/pdf)
+- [html](https://pub.dev/packages/html)
 
 ## Installation 
 Clone the repository. With Flutter installed, run the application with `main.dart`

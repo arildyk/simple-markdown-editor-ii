@@ -12,6 +12,7 @@ import 'package:path/path.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:simple_markdown_editor_ii/config/markdown_stylesheet.dart';
+import 'package:simple_markdown_editor_ii/helpers/markdown_to_pdf_helper.dart';
 import 'package:simple_markdown_editor_ii/widgets/left_window_title_bar_box.dart';
 import 'package:simple_markdown_editor_ii/widgets/right_window_title_bar_box.dart';
 
@@ -125,6 +126,8 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       file = File(outputFile!);
     });
+
+    MarkdownToPDFHelper.convertToPDF(source, file!);
   }
 
   Future<void> exportToHTML() async {
