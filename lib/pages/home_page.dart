@@ -105,6 +105,7 @@ class _HomePageState extends State<HomePage> {
   void newFile() {
     setState(() {
       source = '# Lorem ipsum...';
+      _codeController!.text = source;
       file = null;
     });
   }
