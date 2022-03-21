@@ -40,8 +40,8 @@ MarkdownStyleSheet markdownStylesheet(BuildContext context) {
       fontSize: 16,
     ),
     code: const TextStyle(
-      color: Colors.white,
-      backgroundColor: Color(0xff595A53),
+      color: Color(0xffD7BA7D),
+      backgroundColor: Color(0xff1E1E1E),
       fontFamily: 'Consolas',
       fontSize: 16,
     ),
